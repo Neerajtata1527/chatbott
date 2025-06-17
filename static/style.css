@@ -1,14 +1,22 @@
+
+:root {
+    --primary-color: #00c6ff;
+    --secondary-color: #0072ff;
+    --error-color: #ff6b6b;
+}
+
 body {
-    background: linear-gradient(-45deg, #00c6ff, #0072ff, #00ffae, #ff0080);
+    background: linear-gradient(-45deg, var(--primary-color), var(--secondary-color), #00ffae, #ff0080);
     background-size: 400% 400%;
     animation: gradientBG 15s ease infinite;
     font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    padding: 20px;
+    min-height: 100vh;
+    color: white;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    color: white;
-    margin: 0;
 }
 
 @keyframes gradientBG {
@@ -23,14 +31,15 @@ body {
     border: 2px solid rgba(255, 255, 255, 0.3);
     border-radius: 20px;
     padding: 20px;
-    width: 350px;
-    max-width: 90%;
+    width: 100%;
+    max-width: 600px; 
     box-shadow: 0 0 30px rgba(0,0,0,0.5);
     text-align: center;
 }
 
 #chatbox {
-    height: 300px;
+    height: 50vh; 
+    max-height: 500px; 
     overflow-y: auto;
     background: rgba(255,255,255,0.1);
     padding: 10px;
@@ -47,25 +56,27 @@ body {
 
 input[type="text"] {
     flex: 1;
-    padding: 10px;
+    padding: 12px 15px;
     border-radius: 10px;
     border: none;
     background: rgba(255,255,255,0.9);
     color: #333;
+    font-size: 16px;
 }
 
 button {
-    padding: 10px 15px;
+    padding: 12px 20px;
     border: none;
     border-radius: 10px;
-    background-color: #00c6ff;
+    background-color: var(--primary-color);
     color: white;
     cursor: pointer;
     transition: background-color 0.3s;
+    font-size: 16px;
 }
 
 button:hover {
-    background-color: #0084ff;
+    background-color: var(--secondary-color);
 }
 
 button:disabled {
@@ -73,47 +84,71 @@ button:disabled {
     cursor: not-allowed;
 }
 
-.user {
-    margin: 5px 0;
-    padding: 8px;
-    background: rgba(0, 198, 255, 0.2);
+.user, .bot, .error {
+    margin: 8px 0;
+    padding: 10px 12px;
     border-radius: 10px;
+    word-wrap: break-word;
+}
+
+.user {
+    background: rgba(0, 198, 255, 0.2);
 }
 
 .bot {
-    margin: 5px 0;
-    padding: 8px;
     background: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
 }
 
-.loading {
+.typing, .loading {
     color: #aaa;
     font-style: italic;
 }
 
 .error {
-    margin: 5px 0;
-    padding: 8px;
-    background: rgba(255, 0, 0, 0.2);
-    border-radius: 10px;
-    color: #ffaaaa;
-}
-
-/* Add these new styles */
-.typing {
-    color: #aaa;
-    font-style: italic;
-}
-
-.error {
-    color: #ff6b6b;
+    color: var(--error-color);
     background: rgba(255, 0, 0, 0.1);
-    padding: 8px;
-    border-radius: 8px;
 }
 
-input:disabled, button:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+    
+    .chat-container {
+        padding: 15px;
+        border-radius: 15px;
+    }
+    
+    #chatbox {
+        height: 60vh;
+    }
+    
+    input[type="text"], button {
+        padding: 10px 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 5px;
+    }
+    
+    .chat-container {
+        padding: 10px;
+        border-radius: 10px;
+    }
+    
+    #chatbox {
+        height: 65vh;
+    }
+    
+    input[type="text"], button {
+        padding: 8px 10px;
+        font-size: 14px;
+    }
+    
+    h1 {
+        font-size: 1.5rem;
+    }
 }
