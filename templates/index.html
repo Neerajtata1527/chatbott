@@ -1,1 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fitness Chatbot</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script>
+        async function sendMessage() {
+            const messageInput = document.getElementById("message");
+            const userMessage = messageInput.value.trim();
+            if(!userMessage) return;
 
+            const chatbox = document.getElementById("chatbox");
+            const sendButton = document.querySelector("button");
+            
+            // Add user message to chat
+            chatbox.innerHTML += `<div class='user'>👤 You: ${userMessage}</div>`;
+            messageInput.value = "";
+            sendButton.disabled = true;
+            chatbox.scrollTop = chatbox.scrollHeight;
+
+            // Show loading indicator
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'bot loading';
+            loadingDiv.innerHTML = '🤖 Bot: Thinking...';
+            chatbox.appendChild(loadingDiv);
+            chatbox.scrollTop = chatbox.scrollHeight;
+
+            try {
+                const response = await fetch("/chat", {
+                    method: "POST",
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({message: userMessage})
+                });
+
+                if (!response.ok) {
+                    throw new Error(await response.text());
+                }
+
+                const data = await response.json();
+                
+                // Remove loading indicator
+                chatbox.removeChild(loadingDiv);
+                
+                // Add bot response
+                if (data.error) {
+                    chatbox.innerHTML += `<div class='error'>⚠️ Error: ${data.error}</div>`;
+                } else {
+                    chatbox.innerHTML += `<div class='bot'>🤖 Bot: ${data.response}</div>`;
+                }
+            } catch (error) {
+                chatbox.removeChild(loadingDiv);
+                chatbox.innerHTML += `<div class='error'>⚠️ Error: ${error.message}</div>`;
+            } finally {
+                sendButton.disabled = false;
+                messageInput.focus();
+                chatbox.scrollTop = chatbox.scrollHeight;
+            }
+        }
+
+        <!-- Add this to your <script> section -->
+async function sendMessage() {
+    const messageInput = document.getElementById("message");
+    const userMessage = messageInput.value.trim();
+    if (!userMessage) return;
+
+    // Disable input during request
+    messageInput.disabled = true;
+    document.querySelector("button").disabled = true;
+
+    // Add user message to chat
+    const chatbox = document.getElementById("chatbox");
+    chatbox.innerHTML += `<div class='user'>👤 You: ${userMessage}</div>`;
+    messageInput.value = "";
+    
+    // Show typing indicator
+    const typingDiv = document.createElement('div');
+    typingDiv.className = 'bot typing';
+    typingDiv.innerHTML = '🤖 Bot: Thinking...';
+    chatbox.appendChild(typingDiv);
+    chatbox.scrollTop = chatbox.scrollHeight;
+
+    try {
+        const response = await fetch("/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: userMessage })
+        });
+        
+        const data = await response.json();
+        chatbox.removeChild(typingDiv);
+        chatbox.innerHTML += `<div class='bot'>🤖 Bot: ${data.response}</div>`;
+    } catch (error) {
+        chatbox.removeChild(typingDiv);
+        chatbox.innerHTML += `<div class='error'>⚠️ Network Error: Try again later</div>`;
+    } finally {
+        messageInput.disabled = false;
+        document.querySelector("button").disabled = false;
+        messageInput.focus();
+        chatbox.scrollTop = chatbox.scrollHeight;
+    }
+}
+    </script>
+</head>
+<body>
+    <div class="chat-container">
+        <h1>🏋️ Fitness Chatbot 🥗</h1>
+        <div id="chatbox">
+            <div class='bot'>🤖 Bot: Hey there! 👋 I'm your Fitness Buddy. How can I help you today? 🏋️‍♂️</div>
+        </div>
+        <div class="input-container">
+            <input type="text" id="message" placeholder="Ask me anything..." 
+                   onkeydown="if(event.key==='Enter') sendMessage()">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+</body>
+</html>
