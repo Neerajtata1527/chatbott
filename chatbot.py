@@ -1,44 +1,15 @@
-# import requests
-# def get_response(user_input):
-#     API_URL = "https://api.deepinfra.com/v1/openai/chat/completions"
-#     headers = {
-#         "Content-Type": "application/json",
-#         "Authorization": "iySwJqYAAtCejNQrxNUq68ZdP0ehKfYO"
-#     }
-#     data = {
-#         "model": "meta-llama/Meta-Llama-3-8B-Instruct",
-#         "messages": [{"role": "user", "content": f"Answer briefly as a fitness trainer: {user_input}"}],
-#         "max_tokens": 100
-#     }
-    
-#     try:
-#         response = requests.post(API_URL, json=data, headers=headers).json()
-#         return response["choices"][0]["message"]["content"]
-#     except:
-#         return "Let's focus on fitness! Ask me about workouts or nutrition."
-    
-# import requests
-
-# API_URL = "https://api.deepinfra.com/v1/openai/chat/completions"
-# headers = {
-#     "Content-Type": "application/json",
-#     "Authorization": "Bearer E1QD3KdkBWRZPDWvm45yZz7GgQ18p62c"  # Replace with your key
-# }
-# data = {
-#     "model": "meta-llama/Meta-Llama-3-8B-Instruct",
-#     "messages": [{"role": "user", "content": "How to gain muscle?"}],
-#     "max_tokens": 100
-# }
-
-# response = requests.post(API_URL, json=data, headers=headers).json()
-# print(response) 
-
 import requests
+import os
+from dotenv import load_dotenv
+load_dotenv()
 def get_response(user_input):
+    api_key=os.getenv("API_KEY")
+    if not api_key:
+        raise ValueError("API_KEY not found in environment variables")
     API_URL = "https://api.deepinfra.com/v1/openai/chat/completions"
     headers = {
         "Content-Type": "application/json",
-        "Authorization": "Bearer E1QD3KdkBWRZPDWvm45yZz7GgQ18p62c"  # Double-check this!
+        "Authorization": f"Bearer {api_key}"
     }
     data = {
         "model": "meta-llama/Meta-Llama-3-8B-Instruct",
@@ -48,8 +19,8 @@ def get_response(user_input):
     
     try:
         response = requests.post(API_URL, json=data, headers=headers).json()
-        print("API Response:", response)  # 👈 Debug line
+        print("API Response:", response)  
         return response["choices"][0]["message"]["content"]
     except Exception as e:
-        print("Error:", e)  # 👈 Check Flask console for this
-        return f"API Error: {str(e)}"  # Return the actual error
+        print("Error:", e)  
+        return f"API Error: {str(e)}" 
