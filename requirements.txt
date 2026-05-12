@@ -1,7 +1,30 @@
-flask
-flask-cors
-requests
-python-dotenv
-gunicorn
-setuptools
-wheel
+# Core web framework
+Flask==3.0.0
+flask-cors==4.0.0
+
+# LangChain ecosystem
+langchain==0.2.0
+langchain-community==0.2.0
+langchain-core==0.2.0
+langchain-groq==0.1.4
+
+# Vector database & embeddings
+chromadb==0.4.24
+sentence-transformers==2.2.2
+huggingface-hub==0.20.3
+
+# Data processing & PDFs
+pandas==2.2.0
+pypdf==4.0.1
+
+# Environment & utilities
+python-dotenv==1.0.1
+
+# Web search fallback (optional – remove if not using)
+duckduckgo-search==6.3.0b1
+
+# Production server (for Render deployment)
+gunicorn==21.2.0
+# Evaluation (only for local testing – not needed in production)
+# ragas==0.1.9
+# datasets==2.18.0
