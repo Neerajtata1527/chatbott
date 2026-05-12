@@ -1,1 +1,24 @@
 .env
+# Vector databases (rebuilt by ingest.py on Render)
+chroma_db_diet/
+chroma_db_workout/
+
+# Raw knowledge base files (CSVs, PDFs) – optional but recommended
+knowledge_base/diet/*.csv
+knowledge_base/diet/*.pdf
+knowledge_base/workout/*.csv
+knowledge_base/workout/*.pdf
+
+# Environment file (contains API keys)
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Evaluation results (local only)
+evaluation_results.csv
+ragas_evaluation_results.csv
+custom_evaluation_results.csv
