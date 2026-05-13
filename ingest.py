@@ -3,11 +3,11 @@ import csv
 import pandas as pd
 from langchain_community.document_loaders import DataFrameLoader, PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.embeddings.fastembed import FastEmbedEmbeddings  # CHANGED
 from langchain_community.vectorstores import Chroma
 
 # ==================== PATHS ====================
-DIET_CSV_PATH = "knowledge_base/diet/diet.csv"   # your new file
+DIET_CSV_PATH = "knowledge_base/diet/diet.csv"
 DIET_TIPS_CSV_PATH = "knowledge_base/diet/diet_tips_dataset.csv"
 WORKOUT_TIPS_CSV_PATH = "knowledge_base/workout/workout.csv"
 WORKOUT_PDF_DIR = "knowledge_base/workout/"
@@ -17,7 +17,6 @@ WORKOUT_DB_DIR = "./chroma_db_workout"
 
 CHUNK_SIZE = 300
 CHUNK_OVERLAP = 50
-EMBEDDING_MODEL = "all-MiniLM-L6-v2"
 
 # ==================== ROBUST CSV LOADER ====================
 def load_robust_csv(filepath):
@@ -34,7 +33,7 @@ def load_robust_csv(filepath):
             rows.append(row)
     return pd.DataFrame(rows, columns=header)
 
-# ==================== DIET FORMATTING (new column names) ====================
+# ==================== DIET FORMATTING ====================
 def format_diet_row(row):
     return (f"Dish: {row['food_name']} – "
             f"Calories: {row['energy_kcal']} kcal, "
@@ -63,6 +62,19 @@ def format_tip_row(row):
             f"Meal Timing: {row['Meal_Timing']}\n"
             f"Scientific Backing: {row['Scientific_Backing']}")
 
+# ==================== EMBEDDING MODEL ====================  # CHANGED
+# Replaced HuggingFaceEmbeddings (all-MiniLM-L6-v2, ~400MB PyTorch)
+# with FastEmbedEmbeddings (BAAI/bge-small-en-v1.5, ~60MB ONNX)
+# Everything else in this file is identical to the original.
+print("Loading embedding model...")
+embeddings = FastEmbedEmbeddings(model_name="BAAI/bge-small-en-v1.5")  # CHANGED
+print("Embedding model ready.\n")
+
+splitter = RecursiveCharacterTextSplitter(
+    chunk_size=CHUNK_SIZE,
+    chunk_overlap=CHUNK_OVERLAP
+)
+
 # ==================== DIET KNOWLEDGE BASE ====================
 print("📥 Ingesting diet database...")
 dfs = []
@@ -90,10 +102,13 @@ df_combined = pd.concat(dfs, ignore_index=True)
 loader = DataFrameLoader(df_combined, page_content_column="text")
 diet_docs = loader.load()
 
-splitter = RecursiveCharacterTextSplitter(chunk_size=CHUNK_SIZE, chunk_overlap=CHUNK_OVERLAP)
 diet_chunks = splitter.split_documents(diet_docs)
-embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
-diet_vectorstore = Chroma.from_documents(diet_chunks, embeddings, persist_directory=DIET_DB_DIR)
+
+diet_vectorstore = Chroma.from_documents(
+    diet_chunks,
+    embeddings,
+    persist_directory=DIET_DB_DIR
+)
 diet_vectorstore.persist()
 print(f"✅ Diet DB ready with {len(diet_chunks)} chunks.\n")
 
@@ -104,10 +119,14 @@ all_workout_docs = []
 if os.path.exists(WORKOUT_TIPS_CSV_PATH):
     df_workout = load_robust_csv(WORKOUT_TIPS_CSV_PATH)
     df_workout['text'] = df_workout.apply(
-        lambda row: f"Workout Tip: {row['Tip_Title']}\n"
-                   f"Description: {row['Tip_Description']}\n"
-                   f"Equipment: {row['Equipment_Needed']} | Difficulty: {row['Difficulty_Level']}\n"
-                   f"Target Muscles: {row['Muscle_Groups_Targeted']} | Scientific Backing: {row['Scientific_Backing']}",
+        lambda row: (
+            f"Workout Tip: {row['Tip_Title']}\n"
+            f"Description: {row['Tip_Description']}\n"
+            f"Equipment: {row['Equipment_Needed']} | "
+            f"Difficulty: {row['Difficulty_Level']}\n"
+            f"Target Muscles: {row['Muscle_Groups_Targeted']} | "
+            f"Scientific Backing: {row['Scientific_Backing']}"
+        ),
         axis=1
     )
     loader = DataFrameLoader(df_workout, page_content_column="text")
@@ -133,7 +152,12 @@ if not all_workout_docs:
     raise FileNotFoundError("No workout data found.")
 
 workout_chunks = splitter.split_documents(all_workout_docs)
-workout_vectorstore = Chroma.from_documents(workout_chunks, embeddings, persist_directory=WORKOUT_DB_DIR)
+
+workout_vectorstore = Chroma.from_documents(
+    workout_chunks,
+    embeddings,
+    persist_directory=WORKOUT_DB_DIR
+)
 workout_vectorstore.persist()
 print(f"✅ Workout DB ready with {len(workout_chunks)} chunks.\n")
 print("🚀 Ingestion complete!")
