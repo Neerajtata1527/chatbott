@@ -1,8 +1,11 @@
+# CPU-only PyTorch wheels
+--extra-index-url https://download.pytorch.org/whl/cpu
+
 # Core web framework
 Flask==3.0.0
 flask-cors==4.0.0
 
-# LangChain ecosystem (pinned versions that work together)
+# LangChain ecosystem
 langchain==0.2.0
 langchain-community==0.2.0
 langchain-core==0.2.0
@@ -13,6 +16,10 @@ chromadb==0.4.24
 sentence-transformers==2.2.2
 huggingface-hub==0.20.3
 
+# CPU-only torch (IMPORTANT)
+torch==2.2.2+cpu
+torchvision==0.17.2+cpu
+
 # Data processing and PDF
 pandas==2.2.0
 pypdf==4.0.1
@@ -20,7 +27,7 @@ pypdf==4.0.1
 # Environment
 python-dotenv==1.0.1
 
-# Optional web search (if used)
+# Optional web search
 duckduckgo-search==6.3.7
 
 # Production server
