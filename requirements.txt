@@ -21,7 +21,7 @@ pypdf==4.0.1
 python-dotenv==1.0.1
 
 # Optional web search (if used)
-duckduckgo-search==6.3.0b1
+duckduckgo-search==6.3.7
 
 # Production server
 gunicorn==21.2.0
